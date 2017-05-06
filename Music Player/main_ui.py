@@ -11,12 +11,18 @@ songs=["dummy",
        "02 - Tu Hai Ki Nahi.mp3",
        "2pac - Raise Up.mp3",
        "04 - Aafreen - DownloadMing.SE[1].mp3",
-       "08 - Wish I Was Your Lover.mp3"]
+       "08 - Wish I Was Your Lover.mp3",
+       "rockabye.mp3",
+       "monster.mp4",
+       "warzone.mp3"
+       ]
 
 class MainUi(Tk):
     song_counter=0 #this increases by 20 each time a button is added
     current_list=["dummy"]
+    current_playing_index=0
     current_focus_index=0
+    paused=False
     def __init__(self,*args, **kwargs):
         Tk.__init__(self,*args, **kwargs)
         pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer to avoid sound lag
@@ -54,19 +60,19 @@ class MainUi(Tk):
         self.frame5.config(background="gray53")
         self.frame5.place(x=10,y=50)
 
-        self.play=Button(self.frame5,text="Play",width=3)
+        self.play=Button(self.frame5,text="Play",width=5)
         self.play.config(background="white")
         self.play.pack(side=LEFT)
-        self.pause=Button(self.frame5,text="pause",width=3)
+        self.pause=Button(self.frame5,text="pause",width=5,command=self.pause)
         self.pause.config(background="white")
         self.pause.pack(side=LEFT)
-        self.previous=Button(self.frame5,text="preious",width=3)
+        self.previous=Button(self.frame5,text="preious",width=5,command=self.playprevious)
         self.previous.config(background="white")
         self.previous.pack(side=LEFT)
-        self.stop=Button(self.frame5,text="stop",width=3)
+        self.stop=Button(self.frame5,text="stop",width=5)
         self.stop.config(background="white")
         self.stop.pack(side=LEFT)
-        self.next=Button(self.frame5,text="next",width=3)
+        self.next=Button(self.frame5,text="next",width=5,command=self.playnext)
         self.next.config(background="white")
         self.next.pack(side=LEFT)
 
@@ -103,7 +109,27 @@ class MainUi(Tk):
     def playSong(self,id,event):
         pygame.mixer.music.load(songs[id])
         pygame.mixer.music.play()
+        self.current_playing_index=id
 
+    def playnext(self):
+        if len(self.current_list)>self.current_playing_index+1:
+            self.playSong(self.current_playing_index+1,"")
+
+    def playprevious(self):
+        if 1<self.current_playing_index:
+            self.playSong(self.current_playing_index-1,"")
+
+
+        
+    def pause(self):
+        if not self.paused:
+            pygame.mixer.music.pause()
+            self.pause.configure(text="Play")
+        else:
+            pygame.mixer.music.unpause()
+            self.pause.configure(text="Pause")
+        self.paused= not self.paused
+        
     def addButton(self):
         ld=Button(self.frame4,height=2,anchor=W,text="song.mp3",width=130,bg="white",relief=GROOVE,state=DISABLED)
         ld.pack(side=LEFT)
@@ -122,10 +148,7 @@ class MainUi(Tk):
 
 
 a=MainUi();
-a.addButton()
-a.addButton()
-a.addButton()
-a.addButton()
-a.addButton()
-a.addButton()
+for _ in range(len(songs)-1):
+    a.addButton()
+    
 a.mainloop()
